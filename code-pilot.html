@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodePilot - AI Code Generator</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/js/all.min.js"></script>
+    <style>
+        body {
+            background: #000;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 20px rgba(0,0,0,0.5);
+            max-width: 700px;
+            margin: auto;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .logo {
+            width: 120px;
+            display: block;
+            margin: auto;
+        }
+        textarea {
+            width: 100%;
+            height: 120px;
+            resize: none;
+            border-radius: 10px;
+            padding: 15px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+        }
+        .btn-generate {
+            background: #ff5722;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+        .btn-generate:hover {
+            background: #e64a19;
+        }
+        .response-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            position: relative;
+            text-align: left;
+            white-space: pre-wrap;
+        }
+        /* Code block styling */
+        pre {
+            background-color: #1e1e1e;
+            color: #00ff88;
+            padding: 10px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: "Courier New", Courier, monospace;
+        }
+        /* Copy button styling */
+        .copy-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: #444;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .copy-btn:hover {
+            background: #666;
+        }
+        /* Loader animation */
+        .loader {
+            display: none;
+            margin: auto;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Footer */
+        footer {
+            margin-top: 20px;
+            color: #aaa;
+            font-size: 14px;
+        }
+        footer a {
+            color: #ff5722;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Logo -->
+    <img src="C:\Users\Vinod Gore\Downloads\Designer.png" alt="Code Pilot Logo" class="logo">
+
+    <h1>🚀 CodePilot - AI Code Generator</h1>
+    <p>Developed by <b>Vinod Gore</b> (<a href="mailto:jenkinsgore1@gmail.com">jenkinsgore1@gmail.com</a>)</p>
+
+    <div class="container">
+        <form id="codeForm">
+            <textarea name="userInput" id="userInput" placeholder="Enter your request..." required></textarea>
+            <br>
+            <button type="submit" class="btn btn-generate mt-3">Generate Code</button>
+        </form>
+
+        <!-- Loader -->
+        <div class="loader mt-3" id="loading"></div>
+
+        <!-- Response Box -->
+        <div class="response-box mt-3" id="responseBox" style="display: none;">
+            <h3>Output:</h3>
+            <button class="copy-btn" onclick="copyToClipboard()"><i class="fas fa-copy"></i></button>
+            <pre id="responseText">Fetching response...</pre>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Developed by <b>Vinod Gore</b> | Contact: <a href="mailto:jenkinsgore1@gmail.com">jenkinsgore1@gmail.com</a></p>
+    </footer>
+
+    <script>
+        document.getElementById("codeForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            let userInput = document.getElementById("userInput").value;
+            let responseBox = document.getElementById("responseBox");
+            let responseText = document.getElementById("responseText");
+            let loading = document.getElementById("loading");
+
+            console.log("User input:", userInput);
+            console.log("Sending API request to: https://copilot5.p.rapidapi.com/copilot");
+
+            // Show loading animation
+            loading.style.display = "block";
+            responseBox.style.display = "none";
+
+            try {
+                let response = await fetch("https://copilot5.p.rapidapi.com/copilot", {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "x-rapidapi-host": "copilot5.p.rapidapi.com",
+                        "x-rapidapi-key": "fbbc4642d9msha2261ff4aaeb04ep1faab6jsn2c5cc679e899", // Replace with actual API key
+                        "developer-name": "Vinod Gore",
+                        "developer-email": "jenkinsgore1@gmail.com"
+                    },
+                    body: JSON.stringify({ 
+                        message: userInput,
+                        conversation_id: null,
+                        markdown: true
+                    })  
+                });
+
+                let data = await response.json();
+                console.log("API Response:", data);
+
+                if (data.status === "OK" && data.data && data.data.message) {
+                    let formattedMessage = data.data.message
+                        .replace(/```(\w+)?\n/g, '<pre><code>') // Start code block
+                        .replace(/\n```/g, '</code></pre>') // End code block
+                        .replace(/\n/g, "<br>"); // Preserve line breaks
+
+                    responseText.innerHTML = formattedMessage; // Show formatted response
+                } else {
+                    responseText.innerHTML = "<p>No valid response from Copilot.</p>";
+                }
+
+            } catch (error) {
+                console.error("Error fetching API:", error);
+                responseText.innerHTML = "<p>Error fetching response.</p>";
+            }
+
+            // Hide loading and show output
+            loading.style.display = "none";
+            responseBox.style.display = "block";
+        });
+
+        // Function to copy response text
+        function copyToClipboard() {
+            let text = document.getElementById("responseText").innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Copied to clipboard!");
+            }).catch(err => {
+                console.error("Error copying text: ", err);
+            });
+        }
+    </script>
+
+</body>
+</html>
